@@ -10,6 +10,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 import speech_recognition as sr
+import io
 
 # Download necessary NLTK resources
 nltk.download("punkt")
@@ -61,7 +62,7 @@ if uploaded_file is not None:
             break
 
     if text_column:
-        df[["Processed_Text", "Sentiment_Score", "Sentiment_Label"]] = df[text_column].apply(lambda x: pd.Series(analyze_sentiment(str(x))))
+        df["Processed_Text"], df["Sentiment_Score"], df["Sentiment_Label"] = zip(*df[text_column].apply(analyze_sentiment))
 
         st.write("### Sentiment Analysis Results")
         st.dataframe(df[[text_column, "Processed_Text", "Sentiment_Label"]])
@@ -74,17 +75,17 @@ if uploaded_file is not None:
     else:
         st.warning("No valid text column found in the uploaded file!")
 
-# ✍️ **Real-time Text Sentiment Analysis**
+# ✍ Real-time Text Sentiment Analysis
 st.header("📝 Real-time Text Sentiment Analysis")
 user_text = st.text_area("Enter text for sentiment analysis:", key="text_input_area")
 
 if user_text:
     processed_text, sentiment_score, sentiment_label = analyze_sentiment(user_text)
-    st.write(f"**Processed Text:** {processed_text}")
-    st.write(f"**Sentiment Score:** {sentiment_score}")
-    st.write(f"**Sentiment Label:** {sentiment_label}")
+    st.write(f"Processed Text: {processed_text}")
+    st.write(f"Sentiment Score: {sentiment_score}")
+    st.write(f"Sentiment Label: {sentiment_label}")
 
-# 🎤 **Real-time Speech Sentiment Analysis**
+# 🎤 Real-time Speech Sentiment Analysis
 st.header("🎤 Real-time Speech Sentiment Analysis")
 
 if st.button("Start Recording"):
@@ -95,12 +96,12 @@ if st.button("Start Recording"):
 
         try:
             speech_text = recognizer.recognize_google(audio)
-            st.write(f"**Recognized Speech:** {speech_text}")
+            st.write(f"Recognized Speech: {speech_text}")
 
             processed_text, sentiment_score, sentiment_label = analyze_sentiment(speech_text)
-            st.write(f"**Processed Text:** {processed_text}")
-            st.write(f"**Sentiment Score:** {sentiment_score}")
-            st.write(f"**Sentiment Label:** {sentiment_label}")
+            st.write(f"Processed Text: {processed_text}")
+            st.write(f"Sentiment Score: {sentiment_score}")
+            st.write(f"Sentiment Label: {sentiment_label}")
 
         except sr.UnknownValueError:
             st.error("Google Speech Recognition could not understand the audio.")
